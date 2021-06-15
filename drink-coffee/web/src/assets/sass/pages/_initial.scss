@@ -1,0 +1,101 @@
+@import "./login";
+@import "./register";
+@import "./forgot_password";
+@import "./password_recovery_feedback";
+
+.initial {
+	max-width: 100vw;
+	max-height: 100vh;
+	overflow: hidden;
+	background-color: $greye;
+
+	&:before {
+		content: "";
+		width: 0px;
+		height: 0px;
+		top: 0px;
+		left: 0px;
+		z-index: 0;
+		border: none;
+		border-top: 100vh solid $greyd;
+		border-left: 100vw solid transparent;
+		border-right: 100vw solid transparent;
+		display: block;
+		position: absolute;
+	}
+
+	.slider {
+		max-width: 100vw;
+		max-height: 100vh;
+		width: 100vw;
+		height: 100vh;
+		transition: 1s;
+		display: inline-flex;
+		flex-wrap: nowrap;
+		overflow: hidden;
+
+		@keyframes sliderItemIn {
+			0% {
+				opacity: 0;
+				z-index: 1;
+				left: 100%;
+				position: absolute;
+				visibility: hidden;
+			}
+			100% {
+				opacity: 1;
+				left: 0px;
+				position: relative;
+				visibility: visible;
+			}
+		}
+		@keyframes sliderItemOut {
+			0% {
+				opacity: 1;
+				z-index: 0;
+				left: 0px;
+				visibility: visible;
+				position: absolute;
+			}
+			100% {
+				opacity: 0;
+				left: 100%;
+				position: absolute;
+				visibility: hidden;
+			}
+		}
+		&__item {
+			min-width: 100vw;
+			min-height: 100vh;
+			width: 100vw;
+			height: 100vh;
+			transition: 1s;
+			z-index: 0;
+			opacity: 0;
+			left: 100%;
+			visibility: hidden;
+			position: absolute;
+			display: flex;
+			justify-content: center;
+			align-items: center;
+
+			&--active {
+				opacity: 1;
+				transition: 1s;
+				z-index: 1;
+				left: 0px;
+				visibility: visible;
+				position: relative;
+			}
+		}
+	}
+	.slider.animation_controller {
+		&__item {
+			animation: sliderItemOut 0.5s forwards ease-out;
+
+			&--active {
+				animation: sliderItemIn 0.5s forwards ease-in;
+			}
+		}
+	}
+}

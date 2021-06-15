@@ -7,12 +7,9 @@ class OrderItemValidator
     public function store(array $data)
     {
         $validations = [
-            "id" => ["required" => true, "length" => 19],
-            "created_at" => ["required" => true],
-            "order_id" => ["required" => true, "length" => 19],
             "product_id" => ["required" => true, "length" => 19],
-            "amount" => ["required" => true, "minValue" => 1],
-            "total_each" => ["required" => true, "minValue" => 0],
+            "added" => ["required" => true, "minValue" => 1],
+            "each_price" => ["required" => true, "minValue" => 0],
             "total" => ["required" => true, "minValue" => 0],
         ];
 
@@ -22,12 +19,9 @@ class OrderItemValidator
     public function update(array $data)
     {
         $validations = [
-            "id" => ["required" => true, "length" => 19],
-            "updated_at" => ["required" => true],
-            "order_id" => ["required" => true, "length" => 19],
             "product_id" => ["required" => true, "length" => 19],
-            "amount" => ["required" => true, "minValue" => 1],
-            "total_each" => ["required" => true, "minValue" => 0],
+            "added" => ["required" => true, "minValue" => 1],
+            "each_price" => ["required" => true, "minValue" => 0],
             "total" => ["required" => true, "minValue" => 0],
         ];
 

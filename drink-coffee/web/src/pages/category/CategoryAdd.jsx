@@ -1,67 +1,82 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import validate from "./../../validator";
 
 export default function CategoryAdd(props) {
-    const [feedback, setFeedback] = useState("");
+	const [feedback, setFeedback] = useState("");
 
-    const [fields, setFields] = useState({
-        name: {
-            value: "",
-            feedback: "",
-            isValid: false,
-            validations: { required: true },
-        }
-    });
+	const [fields, setFields] = useState({
+		name: {
+			value: "",
+			feedback: "",
+			isValid: false,
+			validations: { required: true },
+		},
+	});
 
-    const handleChange = (e, key) => {
-        let state = { ...fields };
-        state[key].value = e.target.value;
-        setFields(state);
+	const handleChange = (e, key) => {
+		let state = { ...fields };
+		state[key].value = e.target.value;
+		setFields(state);
 
-        handleBlur(e, key);
-    }
+		handleBlur(e, key);
+	};
 
-    const handleBlur = async (e, key) => {
-        let message = ``;
-        message = validate(e.target.value, fields[key].validations);
+	const handleBlur = async (e, key) => {
+		let message = ``;
+		message = validate(e.target.value, fields[key].validations);
 
-        let state = { ...fields };
-        state[key].isValid = (message.length <= 0);
-        state[key].feedbacl = message;
-        setFields(state);
-    }
+		let state = { ...fields };
+		state[key].isValid = message.length <= 0;
+		state[key].feedback = message;
+		setFields(state);
+	};
 
-    const handleSubmit = async (e) => {
-        e.preventDefault();
+	const handleSubmit = async (e) => {
+		e.preventDefault();
 
-        const hasError = Object.keys(fields).find((field) => (!fields[field].isValid));
-        if (hasError) { return; }
+		const hasError = Object.keys(fields).find((field) => !fields[field].isValid);
+		if (hasError) {
+			return;
+		}
 
-        let form = new FormData();
-        form.append("name", fields.name.value);
+		let form = new FormData();
+		form.append("name", fields.name.value);
 
-        let res = await fetch(`http://localhost:8080/api/category`, { method: "post", body: form })
-            .then((res) => (res.json())).then((res) => (res));
+		let res = await fetch(`http://localhost:8080/api/category`, {
+			method: "post",
+			body: form,
+		})
+			.then((res) => res.json())
+			.then((res) => res);
 
-        if (res.status !== "success") {
-            return setFeedback(res.message);
-        }
+		if (res.status !== "success") {
+			return setFeedback(res.message);
+		}
 
-        props.getCategories();
-        
-        return props.setRoute("list");
-    }
+		props.getCategories();
 
-    return (
-        <div className="category_add">
-            <form onSubmit={handleSubmit}>
-                {feedback}
-                <div className="text_field">
-                    <label htmlFor="name">Name <span style={{ display: "block" }}>{fields.name.feedback}</span></label>
-                    <input type="text" id="name" className="field" value={fields.name.value} onBlur={(e) => handleBlur(e, "name")} onChange={(e) => handleChange(e, "name")} />
-                </div>
-                <button>Create</button>
-            </form>
-        </div>
-    );
+		return props.setRoute("list");
+	};
+
+	return (
+		<div className="category_add">
+			<form onSubmit={handleSubmit}>
+				{feedback}
+				<div className="text_field">
+					<input
+						type="text"
+						id="name"
+						className="text_field__field"
+						value={fields.name.value}
+						onBlur={(e) => handleBlur(e, "name")}
+						onChange={(e) => handleChange(e, "name")}
+					/>
+					<label htmlFor="name" className="text_field__label">
+						Name <span className="text_field__feedback">{fields.name.feedback}</span>
+					</label>
+				</div>
+				<button className="button">Create</button>
+			</form>
+		</div>
+	);
 }

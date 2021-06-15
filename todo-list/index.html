@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/css/bootstrap.min.css" rel="stylesheet" />
+		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" />
+		<title>Todo App | Made by Modo Programador</title>
+		<link rel="stylesheet" href="./asset/css/main.css" />
+	</head>
+	<body>
+		<div class="todo">
+			<h1 class="todo__title">Todo App</h1>
+			<a href="#" class="todo__made_by">Made by Modo Programador</a>
+			<div class="todo__content">
+				<form class="todo__insert_form todo__insert_form--active">
+					<input type="text" class="todo__field form-control description" placeholder="Ex: Study..." />
+					<button class="todo__button btn btn-primary"><i class="fa fa-plus"></i> Add</button>
+				</form>
+				<form class="todo__update_form">
+					<input type="hidden" class="todo__field form-control id" />
+					<input type="text" class="todo__field form-control description" placeholder="Ex: Study..." />
+					<button class="todo__button btn btn-primary"><i class="fa fa-pencil-alt"></i> Update</button>
+				</form>
+				<table class="todo__table table table-striped table-hover table-sm">
+					<thead class="todo__thead">
+						<tr class="todo__tr">
+							<th class="todo__th">Description</th>
+							<th class="todo__th">Action</th>
+						</tr>
+					</thead>
+					<tbody class="todo__tbody"></tbody>
+				</table>
+			</div>
+		</div>
+
+		<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/js/bootstrap.bundle.min.js"></script>
+		<script src="./asset/js/todo.js"></script>
+		<script src="./asset/js/main.js"></script>
+	</body>
+</html>

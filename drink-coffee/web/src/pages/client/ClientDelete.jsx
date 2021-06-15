@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
 
 export default function ClientDelete(props) {
     const [client, setClient] = useState({});
     useEffect(() => {
         setClient(props.clients.find((c) => (c.id === props.removingId)));
+		// eslint-disable-next-line react-hooks/exhaustive-deps
     }, [props.removingId])
 
     const confirm = async () => {

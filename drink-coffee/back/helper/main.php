@@ -15,11 +15,6 @@ function text()
     return \Helper\Text::getInstance();
 }
 
-function vector()
-{
-    return \Helper\Vector::getInstance();
-}
-
 function bcrypt()
 {
     return \Helper\Bcrypt::getInstance();

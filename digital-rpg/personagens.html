@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+	<head>
+		<meta charset="utf-8" />
+		<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>DIGITAL RPG | FEITO POR FELIPE TAKEU IWAMOTO</title>
+		<link rel="stylesheet" href="./assets/css/main.css" />
+	</head>
+	<body>
+		<div class="feedback"></div>
+
+		<div class="character">
+			<div class="screen character__add">
+				<button data-screen=".character__select">selecionar</button>
+				<br />
+				<label for="character_add__name">Nome</label>
+				<input type="text" id="character__add__name" placeholder="Nome" />
+				<br />
+				<label for="character_add__job">Classe</label>
+				<select id="character__add__job"></select>
+				<button data-form="character_add">novo</button>
+			</div>
+			<div class="screen character__select">
+				<button data-screen=".character__add">novo</button>
+				<div class="character__list"></div>
+			</div>
+		</div>
+
+		<script src="./assets/js/main.js"></script>
+		<script src="./assets/js/classes/character.js"></script>
+		<script src="./assets/js/page/personagens.js"></script>
+	</body>
+</html>

@@ -4,151 +4,218 @@ namespace App\API;
 
 class OrderController
 {
-    public function index($req, $res)
-    {
-        $record = db()->read("order")
-            ->orderBy("`name` asc")->add()->run();
-            
-        foreach ($record as $key => $value) {
-            $record[$key]["order_items"] = db()->read("order_item")
-                ->where("`order_id`=:order_id")->binding(["order_id" => $value["order_id"]])
-                ->add()->run();
-        }
+	public function index($req, $res)
+	{
+		$queryParams = $req->getQueryParams();
+		$page = isset($queryParams["page"]) ? --$queryParams["page"] : 1;
+		$record = db()->read("`order`")
+			->where("`status` not in ('canceled', 'finished')")
+			->orderBy("`created_at` desc")
+			->offset($page * 10)->limit(10)
+			->add()->run();
 
-        return json($record, 201);
-    }
+		$count = db()->fetchMode("column")->column("count(id)")->read("`order`")->add()->run();
+		$count = $count[0] ? $count[0] : 0;
 
-    public function show($req, $res, $params)
-    {
-        $record = db()->read("order")
-            ->where("`id`=:id")->binding(["id" => $params["id"]])
-            ->add()->run();
+		foreach ($record as $key => $value) {
+			$orderItems = db()->read("order_item")
+				->where("`order_id`=:order_id")->binding(["order_id" => $value["id"]])
+				->add()->run();
 
-        $record = $record ? $record[0] : [];
+			$record[$key]["order_items"] = $orderItems;
 
-        if ($record) {
-            $record["order_items"] = db()->read("order_item")
-                ->where("`order_id`=:order_id")->binding(["order_id" => $record["order_id"]])
-                ->add()->run();
-        }
+			foreach ($orderItems as $addedKey =>  $addedValue) {
+				$product = db()->read("product")
+					->where("`id`=:id")->binding(["id" => $addedValue["product_id"]])
+					->add()->run();
 
-        return json($record, 201);
-    }
+				$product = $product ? $product[0] : [];
 
-    public function store($req, $res)
-    {
-        $post = $req->getParsedBody();
+				$record[$key]["order_items"][$addedKey]["product"] = $product;
+			}
+		}
 
-        $post["id"] = text()->unique();
-        $post["created_at"] = strtotime("now");
+		return json([
+			"orders" => $record,
+			"count" => $count,
+		], 201);
+	}
 
-        if (!$post["order_item"])
-            return json(["status" => "error", "message" => "Pedido precisa ter pelo menos 1 item"]);
+	public function show($req, $res, $params)
+	{
+		$record = db()->read("order")
+			->where("`id`=:id")->binding(["id" => $params["id"]])
+			->add()->run();
 
-        if ($error = orderValidator()->store($post))
-            return json(["status" => "error", "error" => $error]);
+		$record = $record ? $record[0] : [];
 
-        if ($error = orderItemValidator()->store($post["order_item"]))
-            return json(["status" => "error", "error" => $error]);
+		if ($record) {
+			$record["order_items"] = db()->read("order_item")
+				->where("`order_id`=:order_id")->binding(["order_id" => $record["order_id"]])
+				->add()->run();
+		}
 
-        $orderItems = $post["order_item"];
-        unset($post["order_item"]);
+		return json($record, 201);
+	}
 
-        db()->insert("order")->set($post)->binding($post)
-            ->add()->run();
+	public function store($req, $res)
+	{
+		$post = $req->getParsedBody();
+		$post["order_item"] = json_decode($post["order_item"], true);
 
-        foreach ($orderItems as $orderItem) {
-            $orderItem["order_id"] = $post["id"];
-            $orderItem["created_at"] = $post["created_at"];
+		$post["id"] = text()->unique();
+		$post["created_at"] = strtotime("now");
+		$post["total"] = 0;
 
-            db()->insert("order_item")->set($orderItem)->binding($orderItem)->add();
-        }
+		foreach ($post["order_item"] as $value) {
+			$post["total"] += $value["total"];
+		}
+		if (!$post["order_item"])
+			return json(["status" => "error", "message" => "Order must have at least 1 item."]);
 
-        db()->run();
+		foreach ($post["order_item"] as $orderItem) {
+			if ($error = orderItemValidator()->store($orderItem))
+				return json(["status" => "error", "error" => $error]);
+		}
 
-        $record = db()->read("order")->where("`id`=:id")
-            ->binding(["id" => $post["id"]])->add()->run();
+		if ($error = orderValidator()->store($post))
+			return json(["status" => "error", "error" => $error]);
 
-        if (!$record) {
-            return json([
-                "status" => "error",
-                "message" => "Houve um erro na criação do pedido. Por favor tente novamente."
-            ]);
-        }
+		foreach ($post["order_item"] as $orderItem) {
+			$orderItem["id"] = text()->unique();
+			$orderItem["order_id"] = $post["id"];
+			$orderItem["created_at"] = strtotime("now");
+			if ($error = orderItemValidator()->store($orderItem))
+				return json(["status" => "error", "error" => $error]);
+		}
 
-        return json(["status" => "success"]);
-    }
+		$orderItems = $post["order_item"];
+		unset($post["order_item"]);
 
-    public function update($req, $res, $args)
-    {
-        $post = $req->getParsedBody();
+		db()->insert("`order`")->set($post)->binding($post)
+			->add()->run();
 
-        $post["id"] = text()->unique();
-        $post["updated_at"] = strtotime("now");
+		$dbOrderItem = db();
+		foreach ($orderItems as $orderItem) {
+			unset($orderItem["name"]);
+			$orderItem["id"] = text()->unique();
+			$orderItem["order_id"] = $post["id"];
+			$orderItem["created_at"] = $post["created_at"];
 
-        if (!$post["order_item"])
-            return json(["status" => "error", "message" => "Pedido precisa ter pelo menos 1 item"]);
+			$dbOrderItem->insert("order_item")->set($orderItem)->binding($orderItem)->add();
+		}
 
-        if ($error = orderValidator()->update($post))
-            return json(["status" => "error", "error" => $error]);
+		$dbOrderItem->run();
 
-        if ($error = orderItemValidator()->update($post["order_item"]))
-            return json(["status" => "error", "error" => $error]);
+		$record = db()->read("`order`")->where("`id`=:id")
+			->binding(["id" => $post["id"]])->add()->run();
 
-        db()->update("order")->where("`id`=:id")
-            ->set($post)->binding($post)
-            ->add()->run();
+		if (!$record) {
+			return json([
+				"status" => "error",
+				"message" => "There was a error. Please try again later."
+			]);
+		}
 
-        $orderItems = $post["order_item"];
-        unset($post["order_item"]);
+		return json(["status" => "success"]);
+	}
 
-        db()->delete("order_item")->where("`id`=:id")->add()->run();
+	public function update($req, $res, $args)
+	{
+		$post = $req->getParsedBody();
+		$post["order_item"] = json_decode($post["order_item"], true);
 
-        foreach ($orderItems as $orderItem) {
-            $orderItem["order_id"] = $post["id"];
-            $orderItem["updated_at"] = $post["updated_at"];
+		$post["id"] = $args["id"];
+		$post["updated_at"] = strtotime("now");
+		$post["total"] = 0;
 
-            db()->insert("order_item")->set($orderItem)->binding($orderItem)->add();
-        }
+		foreach ($post["order_item"] as $value) {
+			$post["total"] += $value["each_price"] * $value["added"];
+		}
+		if (!$post["order_item"])
+			return json(["status" => "error", "message" => "Order must have at least 1 item."]);
 
-        db()->run();
+		foreach ($post["order_item"] as $orderItem) {
+			if ($error = orderItemValidator()->update($orderItem))
+				return json(["status" => "error", "error" => $error]);
+		}
 
-        $record = db()->read("order")->where("`id`=:id")
-            ->binding(["id" => $post["id"]])->add()->run();
+		if ($error = orderValidator()->update($post))
+			return json(["status" => "error", "error" => $error]);
 
-        if (!$record) {
-            return json([
-                "status" => "error",
-                "message" => "Houve um erro na criação do pedido. Por favor tente novamente."
-            ]);
-        }
+		foreach ($post["order_item"] as $orderItem) {
+			$orderItem["id"] = text()->unique();
+			$orderItem["order_id"] = $post["id"];
+			$orderItem["updated_at"] = strtotime("now");
+			if ($error = orderItemValidator()->update($orderItem))
+				return json(["status" => "error", "error" => $error]);
+		}
 
-        return json(["status" => "success"]);
-    }
+		$orderItems = $post["order_item"];
+		unset($post["order_item"]);
 
-    public function delete($req, $res, $args)
-    {
-        if ($error = orderValidator()->delete(["id" => $args["id"]]))
-            return json(["status" => "error", "error" => $error]);
+		db()->update("`order`")->where("`id`=:id")
+			->set($post)->binding($post)
+			->add()->run();
 
-        db()->delete("order")->where("`id`=:id")
-            ->binding(["id" => $args["id"]])->add()->run();
+		$dbOrderItem = db();
+		$dbOrderItem->delete("order_item")->where("`order_id`=:order_id")
+			->binding(["order_id" => $args["id"]])->add()->run();
 
-        $record = db()->read("order")->where("`id`=:id")
-            ->binding(["id" => $args["id"]])->add()->run();
+		foreach ($orderItems as $orderItem) {
+			unset($orderItem["name"]);
+			$orderItem["id"] = text()->unique();
+			$orderItem["order_id"] = $post["id"];
+			$orderItem["created_at"] = $post["updated_at"];
+			unset($orderItem["product"]);
 
-        if ($record) {
-            return json([
-                "status" => "error",
-                "message" => "Houve um erro na exclusão do pedido. Por favor tente novamente."
-            ]);
-        }
+			$dbOrderItem->insert("order_item")->set($orderItem)->binding($orderItem)->add();
+		}
 
-        return json(["status" => "success"]);
-    }
+		$dbOrderItem->run();
 
-    public function bulkAction($req, $res)
-    {
-        return json(["status" => "success"]);
-    }
+		$record = db()->read("`order`")->where("`id`=:id")
+			->binding(["id" => $post["id"]])->add()->run();
+
+		if (!$record) {
+			return json([
+				"status" => "error",
+				"message" => "There was a error. Please try again later."
+			]);
+		}
+
+		return json(["status" => "success"]);
+	}
+
+	public function delete($req, $res, $args)
+	{
+		if ($error = orderValidator()->delete(["id" => $args["id"]]))
+			return json(["status" => "error", "error" => $error]);
+
+		db()->delete("`order`")->where("`id`=:id")
+			->binding(["id" => $args["id"]])->add()->run();
+
+		db()->delete("order_item")->where("`order_id`=:order_id")
+			->binding(["order_id" => $args["id"]])->add()->run();
+
+		$recordOrder = db()->read("`order`")->where("`id`=:id")
+			->binding(["id" => $args["id"]])->add()->run();
+
+		$recordOrderItem = db()->read("order_item")->where("`order_id`=:order_id")
+			->binding(["order_id" => $args["id"]])->add()->run();
+
+		if ($recordOrder || $recordOrderItem) {
+			return json([
+				"status" => "error",
+				"message" => "There was a error. Please try again later."
+			]);
+		}
+
+		return json(["status" => "success"]);
+	}
+
+	public function bulkAction($req, $res)
+	{
+		return json(["status" => "success"]);
+	}
 }

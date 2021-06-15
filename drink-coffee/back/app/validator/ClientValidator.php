@@ -11,7 +11,8 @@ class ClientValidator
             "created_at" => ["required" => true],
             "name" => ["required" => true],
             "surname" => ["required" => true],
-            "username" => ["required" => true],
+            "email" => ["required" => false],
+            "cpf" => ["required" => true],
             "password" => ["required" => true, "minLength" => 6],
         ];
 
@@ -25,8 +26,9 @@ class ClientValidator
             "updated_at" => ["required" => true],
             "name" => ["required" => true],
             "surname" => ["required" => true],
-            "username" => ["required" => true],
-            "password" => ["required" => true, "minLength" => 6],
+            "email" => ["required" => false],
+            "cpf" => ["required" => true],
+            "password" => ["required" => false, "minLength" => 6],
         ];
 
         return validate($data, $validations);

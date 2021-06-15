@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
-import { useHistory } from "react-router";
 
+import Menu from "./../../components/Menu";
 import ClientList from "./ClientList";
 import ClientAdd from "./ClientAdd";
 import ClientShow from "./ClientShow";
@@ -48,6 +48,7 @@ export default function ClientIndex(props) {
 
     return (
         <div className="client_index">
+			<Menu />
             <button type="button" onClick={() => setRoute("list")}>List</button>
             <button type="button" onClick={() => setRoute("new")}>New</button>
 

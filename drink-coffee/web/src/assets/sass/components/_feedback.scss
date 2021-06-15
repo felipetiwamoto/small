@@ -1,0 +1,36 @@
+.feedback {
+	padding: 20px;
+	top: 0px;
+	right: 0px;
+	z-index: 1000;
+	position: fixed;
+	display: inline-flex;
+	flex-direction: column-reverse;
+
+	@keyframes feedbackIn {
+		from {
+			opacity: 0;
+			transform: translateX(50px);
+		}
+		to {
+			opacity: 1;
+			transform: translateX(0px);
+		}
+	}
+
+	&__item {
+		min-height: 40px;
+		padding: 5px 15px;
+		box-shadow: 0px 3px 6px rgba(0, 0, 0, 0.25);
+		color: $white;
+		background-color: $grey7;
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		animation: feedbackIn 0.5s forwards ease-in;
+
+		* {
+			color: $white;
+		}
+	}
+}

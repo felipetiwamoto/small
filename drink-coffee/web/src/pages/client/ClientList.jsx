@@ -1,10 +1,7 @@
-import React, { useState, useEffect } from "react";
+import React from "react";
+import { timestamps } from "./../../helper";
 
 export default function ClientList(props) {
-    const timestamps = (date) => {
-        const d = new Date(date * 1000);
-        return d.getDate() + '/' + ((d.getMonth()+1)) + '/' + d.getFullYear();
-    }
     return (
         <div className="client_list">
             <table>
@@ -16,8 +13,8 @@ export default function ClientList(props) {
                     </tr>
                 </thead>
                 <tbody>
-                    {props.clients.map((client) => (
-                        <tr>
+                    {props.clients.map((client, index) => (
+                        <tr key={index}>
                             <td>{client.id}</td>
                             <td>{client.name}</td>
                             <td>{timestamps(client.created_at)}</td>

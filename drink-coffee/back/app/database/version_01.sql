@@ -16,6 +16,7 @@ create table `employee`(
     surname varchar(100) not null,
     email varchar(100) not null,
     password text not null,
+    forgot_password_token varchar(19) null,
     created_at varchar(50) not null,
     updated_at varchar(50) null,
     deleted_at varchar(50) null
@@ -26,7 +27,6 @@ create table `product`(
     category_id varchar(19) not null,
     name varchar(100) not null,
     price decimal(10,2) not null default 0,
-    amount int(11) not null default 0,
     created_at varchar(50) not null,
     updated_at varchar(50) null,
     deleted_at varchar(50) null
@@ -55,8 +55,8 @@ create table `order_item`(
     id varchar(19) primary key not null,
     order_id varchar(19) not null,
     product_id varchar(19) not null,
-    amount int(11) not null default 1,
-    total_row decimal(10,2) not null default 0,
+    added int(11) not null default 1,
+    each_price decimal(10,2) not null default 0,
     total decimal(10,2) not null default 0,
     created_at varchar(50) not null,
     updated_at varchar(50) null,

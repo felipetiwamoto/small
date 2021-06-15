@@ -1,73 +1,178 @@
 import React, { useState, useEffect } from "react";
-import { useHistory } from "react-router";
 
+import Menu from "./../../components/Menu";
 import ProductList from "./ProductList";
 import ProductAdd from "./ProductAdd";
 import ProductShow from "./ProductShow";
 import ProductEdit from "./ProductEdit";
 import ProductDelete from "./ProductDelete";
+import { isLogged } from "./../../helper";
+import { useHistory } from "react-router";
 
 export default function ProductIndex(props) {
-    const [route, setRoute] = useState("list");
-    const [categories, setCategories] = useState([]);
-    const [products, setProducts] = useState([]);
-    const [showingId, setShowingId] = useState("");
-    const [editingId, setEditingId] = useState("");
-    const [removingId, setRemovingId] = useState("");
+	const history = useHistory();
 
-    const getCategories = async () => {
-        const res = await fetch(`http://localhost:8080/api/category`)
-            .then((res) => (res.json())).then((res) => (res));
+	const [route, setRoute] = useState("list");
+	const [categories, setCategories] = useState([]);
+	const [products, setProducts] = useState([]);
+	const [count, setCount] = useState(null);
+	const [categoryId, setCategoryId] = useState("");
+	const [pagination, setPagination] = useState(1);
+	const [showingId, setShowingId] = useState("");
+	const [editingId, setEditingId] = useState("");
+	const [removingId, setRemovingId] = useState("");
 
-        setCategories(res);
-    }
+	const getCategories = async () => {
+		const res = await fetch(`http://localhost:8080/api/category/all`)
+			.then((res) => res.json())
+			.then((res) => res);
 
-    const getProducts = async () => {
-        const res = await fetch(`http://localhost:8080/api/product`)
-            .then((res) => (res.json())).then((res) => (res));
+		setCategories(res);
+	};
 
-        setProducts(res);
-    }
+	const getProducts = async () => {
+		const res = await fetch(`http://localhost:8080/api/product?page=${pagination}&category_id=${categoryId}`)
+			.then((res) => res.json())
+			.then((res) => res);
 
-    const show = (id) => {
-        setShowingId(id);
-        return setRoute("show");
-    }
-    const edit = (id) => {
-        setEditingId(id);
-        return setRoute("edit");
-    }
-    const remove = (id) => {
-        setRemovingId(id);
-        return setRoute("remove");
-    }
+		setProducts(res.products);
+		setCount(res.count);
+	};
 
-    useEffect(async () => {
-        getProducts();
-        getCategories();
-    }, []);
+	const show = (id) => {
+		setShowingId(id);
+		return setRoute("show");
+	};
+	const edit = (id) => {
+		setEditingId(id);
+		return setRoute("edit");
+	};
+	const remove = (id) => {
+		setRemovingId(id);
+		return setRoute("remove");
+	};
 
-    const clonedProps = {
-        getProducts,
-        route, setRoute,
-        products, setProducts,
-        categories, setCategories,
-        editingId, setEditingId,
-        showingId, setShowingId,
-        removingId, setRemovingId,
-        show, edit, remove
-    };
+	const flush = () => {
+		setShowingId("");
+		setEditingId("");
+		setRemovingId("");
+	};
 
-    return (
-        <div className="product_index">
-            <button type="button" onClick={() => setRoute("list")}>List</button>
-            <button type="button" onClick={() => setRoute("new")}>New</button>
+	useEffect(() => {
+		!isLogged() && history.push("/");
+		getCategories();
+	}, []);
 
-            {route === "list" && <ProductList {...clonedProps} />}
-            {route === "new" && <ProductAdd {...clonedProps} />}
-            {route === "show" && <ProductShow {...clonedProps} />}
-            {route === "edit" && <ProductEdit {...clonedProps} />}
-            {route === "remove" && <ProductDelete {...clonedProps} />}
-        </div>
-    );
+	useEffect(() => {
+		getProducts();
+		flush();
+	}, [pagination, categoryId]);
+
+	const clonedProps = {
+		getProducts,
+		route,
+		setRoute,
+		products,
+		setProducts,
+		categoryId,
+		setCategoryId,
+		pagination,
+		setPagination,
+		count,
+		setCount,
+		categories,
+		setCategories,
+		editingId,
+		setEditingId,
+		showingId,
+		setShowingId,
+		removingId,
+		setRemovingId,
+		flush,
+		show,
+		edit,
+		remove,
+	};
+
+	return (
+		<div className="crud_index">
+			<div className="container product_index">
+				<Menu />
+				<div className="content">
+					<ul className="tab">
+						<li
+							className={`tab__item list ${route === "list" ? `tab__item--active` : ``}`}
+							onClick={() => setRoute("list")}
+						>
+							List
+						</li>
+						<li
+							className={`tab__item new ${route === "new" ? `tab__item--active` : ``}`}
+							onClick={() => setRoute("new")}
+						>
+							New
+						</li>
+
+						{showingId && (
+							<li
+								className={`tab__item show ${showingId !== "" ? `tab__item--show` : ``} ${
+									route === "show" ? `tab__item--active` : ``
+								}`}
+								onClick={() => setRoute("show")}
+							>
+								Information
+							</li>
+						)}
+						{editingId && (
+							<li
+								className={`tab__item edit ${editingId !== "" ? `tab__item--show` : ``} ${
+									route === "edit" ? `tab__item--active` : ``
+								}`}
+								onClick={() => setRoute("edit")}
+							>
+								Edit
+							</li>
+						)}
+						{removingId && (
+							<li
+								className={`tab__item remove ${removingId !== "" ? `tab__item--show` : ``} ${
+									route === "remove" ? `tab__item--active` : ``
+								}`}
+								onClick={() => setRoute("remove")}
+							>
+								Remove
+							</li>
+						)}
+					</ul>
+					<div className="tab_content">
+						{route === "list" && count !== null && (
+							<div className="tab_content__item">
+								<ProductList {...clonedProps} />
+							</div>
+						)}
+						{route === "new" && (
+							<div className="tab_content__item">
+								<ProductAdd {...clonedProps} />
+							</div>
+						)}
+						{route === "show" && (
+							<div className="tab_content__item">
+								<ProductShow {...clonedProps} />
+							</div>
+						)}
+						{route === "edit" && (
+							<div className="tab_content__item">
+								<ProductEdit {...clonedProps} />
+							</div>
+						)}
+						{route === "remove" && (
+							<div className="tab_content__item">
+								<ProductDelete {...clonedProps} />
+							</div>
+						)}
+					</div>
+				</div>
+			</div>
+		</div>
+	);
 }

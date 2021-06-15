@@ -1,29 +1,47 @@
 import React, { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
 
 export default function ProductDelete(props) {
-    const [product, setProduct] = useState({});
-    useEffect(() => {
-        setProduct(props.products.find((c) => (c.id === props.removingId)));
-    }, [props.removingId])
+	const [product, setProduct] = useState({});
+	useEffect(() => {
+		if (props.removingId == "") return;
+		setProduct(props.products.find((c) => c.id === props.removingId));
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [props.removingId]);
 
-    const confirm = async () => {
-        const res = await fetch(`http://localhost:8080/api/product/delete/${product.id}`)
-            .then((res) => (res.json())).then((res) => (res));
+	const confirm = async () => {
+		const res = await fetch(`http://localhost:8080/api/product/delete/${product.id}`)
+			.then((res) => res.json())
+			.then((res) => res);
 
-        if (res.status !== "success") {
-            props.setFeedback("Something went wrong. Please, try again later.");
-        }
+		if (res.status !== "success") {
+			props.setFeedback("Something went wrong. Please, try again later.");
+		}
 
-        props.getProducts();
-        props.setRoute("list");
-    }
+		props.flush();
+		props.getProducts();
+		props.setRoute("list");
+	};
 
-    return (
-        <div className="product_delete">
-            Are you sure you wanna remove <strong>{product.name}</strong> permanently?
-            <button type="button" onClick={() => confirm()}>confirm</button>
-            <button type="button" onClick={() => props.setRoute("list")}>cancel</button>
-        </div>
-    );
+	const cancel = () => {
+		props.setRemovingId("");
+		props.setRoute("list");
+	};
+
+	return (
+		<div className="crud_delete">
+			<div className="container product_delete">
+				<p className="crud_delete__desc">
+					Are you sure you wanna remove <strong>{product.name}</strong> permanently?
+				</p>
+				<div className="crud_delete__bottom">
+					<button className="button danger" type="button" onClick={() => cancel()}>
+						cancel
+					</button>
+					<button className="button success" type="button" onClick={() => confirm()}>
+						confirm
+					</button>
+				</div>
+			</div>
+		</div>
+	);
 }

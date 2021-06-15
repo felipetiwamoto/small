@@ -1,0 +1,56 @@
+.register {
+	min-width: 600px;
+	padding: 30px;
+	box-shadow: 0px 3px 6px rgba(0, 0, 0, 0.25);
+	background-color: $white;
+	display: inline-flex;
+	flex-direction: column;
+
+	&__form {
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+	}
+
+	&__title {
+		top: -90px;
+		height: 0px;
+		font-weight: 400;
+		text-align: center;
+		font-family: "Merienda", cursive;
+		position: relative;
+	}
+
+	&__row {
+		width:100%;
+		margin-left: -5px;
+		margin-right: -5px;
+		display: flex;
+		flex-wrap: wrap;
+
+		& > &__item {
+			padding-left: 5px;
+			padding-right: 5px;
+			box-sizing: border-box;
+			max-width: 50%;
+			flex-basis: 50%;
+		}
+	}
+
+	&__button {
+		width: 300px;
+		margin-bottom: 30px;
+	}
+
+	&__bottom {
+		padding-top: 15px;
+		width: 100%;
+		font-size: 14px;
+		border-top: 1px solid $greyd;
+		display: flex;
+		justify-content: space-between;
+		color: $grey9;
+		text-decoration: underline;
+		cursor: pointer;
+	}
+}

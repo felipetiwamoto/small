@@ -1,0 +1,126 @@
+.crud_list {
+	.text_field.filter{
+		width:250px;
+		.text_field__field{
+			min-height:30px;
+		}
+	}
+	.table {
+		width: 100%;
+		border-collapse: collapse;
+		&__thead {
+			& .table__th,
+			& .table__td {
+				font-size: 14px;
+				background-color: $grey7;
+				color: $white;
+				&:last-child {
+					text-align: right;
+				}
+			}
+		}
+		&__tbody {
+			.table__tr {
+				.table__th,
+				.table__td {
+					font-size: 16px;
+					&:last-child {
+						text-align: right;
+					}
+				}
+
+				&:nth-child(even) .table__th,
+				&:nth-child(even) .table__td {
+					background-color: $greye;
+				}
+				&:hover .table__th,
+				&:hover .table__td {
+					transition: 0.3s;
+					background-color: $greyd;
+				}
+			}
+		}
+		&__tr {
+		}
+		&__th {
+			height: 30px;
+			min-height: 30px;
+			padding: 5px 15px;
+			text-align: left;
+		}
+		&__td {
+			height: 40px;
+			min-height: 40px;
+			padding: 5px 15px;
+			text-align: left;
+		}
+		&__button {
+			font-size: 12px;
+			min-height: 25px;
+			padding: 2px 7px;
+
+			& + .table__button {
+				margin-left: 10px;
+			}
+
+			&.show {
+				color: $white;
+				border-color: $show;
+				background-color: $show;
+			}
+			&.edit {
+				color: $white;
+				border-color: $edit;
+				background-color: $edit;
+			}
+			&.remove {
+				color: $white;
+				border-color: $remove;
+				background-color: $remove;
+			}
+		}
+	}
+	.pagination {
+		margin-top: 15px;
+		display: flex;
+		justify-content: flex-end;
+		&__prev,
+		&__next {
+			width: 30px;
+			height: 30px;
+			background-color: $greyd;
+			display: flex;
+			justify-content: center;
+			align-items: center;
+			cursor: pointer;
+			svg {
+				width: 25px;
+				height: 25px;
+			}
+		}
+		&__prev {
+		}
+		&__field {
+			input {
+				padding: 2px 5px;
+				min-height: 30px;
+				border: 1px solid $greyd;
+				text-align: center;
+				outline:none;
+
+				&::-webkit-outer-spin-button,
+				&::-webkit-inner-spin-button {
+					-webkit-appearance: none;
+					margin: 0;
+				}
+
+				/* Firefox */
+				&[type="number"] {
+					-moz-appearance: textfield;
+				}
+			}
+		}
+		&__next {
+		}
+	}
+}

@@ -1,66 +1,80 @@
 export default function validate(value, validations) {
-    const types = {
-        required: function (value, validations) {
-            if (value.trim().length <= 0 || value.trim() == "")
-                return `Esse campo é obrigatório.`;
+	const types = {
+		required: function (value, validations) {
+			if (validations.required && (value.trim().length <= 0 || value.trim() === ""))
+				return `This is a mandatory field.`;
 
-            return "";
-        },
-        length: function (value, validations) {
-            if (value.length == validations.length)
-                return `O campo deve ter ${validations.length} dígitos.`;
+			return "";
+		},
+		length: function (value, validations) {
+			if (!validations.required && value.length <= 0) return "";
 
-            return "";
-        },
-        minLength: function (value, validations) {
-            if (value.length < validations.minLength)
-                return `Digite no mínimo ${validations.minLength} dígitos.`;
+			if (value.length !== validations.length) return `The field must have ${validations.length} characters.`;
 
-            return "";
-        },
-        maxLength: function (value, validations) {
-            if (value.length > validations.maxLength)
-                return `Digite no máximo ${validations.maxLength} dígitos.`;
+			return "";
+		},
+		minLength: function (value, validations) {
+			if (!validations.required && value.length <= 0) return "";
 
-            return "";
-        },
-        value: function (value, validations) {
-            if (value == validations.value)
-                return `O valor do campo deve ser [${validations.minLength}].`;
+			if (value.length < validations.minLength)
+				return `The field must have at least ${validations.minLength} characters.`;
 
-            return "";
-        },
-        minValue: function (value, validations) {
-            if (value < validations.minValue)
-                return `O valor mínimo do campo deve ser ${validations.minLength}.`;
+			return "";
+		},
+		maxLength: function (value, validations) {
+			if (!validations.required && value.length <= 0) return "";
 
-            return "";
-        },
-        maxValue: function (value, validations) {
-            if (value > validations.maxValue)
-                return `O valor máximo do campo deve ser ${validations.minLength}.`;
+			if (value.length > validations.maxLength)
+				return `The field must have max ${validations.maxLength} characters.`;
 
-            return "";
-        },
-        isNumeric: function (value, validations) {
-            value = parseFloat(value.replace(",", "."));
+			return "";
+		},
+		value: function (value, validations) {
+			if (!validations.required && value.length <= 0) return "";
 
-            if (value.NaN())
-                return "O valor precisa ser numérico. (pode ter casa decimal).";
-        },
-        isInteger: function (value, validations) {
-            if (value.NaN())
-                return "O valor precisa ser um número inteiro positivo."
-        }
-    };
+			if (value !== validations.value) return `The value must be [${validations.minLength}].`;
 
-    let error = "";
+			return "";
+		},
+		minValue: function (value, validations) {
+			if (!validations.required && value.length <= 0) return "";
 
-    Object.keys(validations).forEach((field, index) => {
-        if (error.length <= 0) {
-            error = types[field](value, validations);
-        }
-    });
+			if (value < validations.minValue) return `The value must be at least ${validations.minLength}.`;
 
-    return error;
+			return "";
+		},
+		maxValue: function (value, validations) {
+			if (!validations.required && value.length <= 0) return "";
+
+			if (value > validations.maxValue) return `The max value must be ${validations.minLength}.`;
+
+			return "";
+		},
+		isNumeric: function (value, validations) {
+			if (!validations.required && value.length <= 0) return "";
+
+			value = parseFloat(value.replace(",", "."));
+
+			if (isNaN(value)) return "The value must be a number.";
+
+			return "";
+		},
+		isInteger: function (value, validations) {
+			if (!validations.required && value.length <= 0) return "";
+
+			if (isNaN(value)) return "The value must be a positive number.";
+
+			return "";
+		},
+	};
+
+	let error = "";
+
+	Object.keys(validations).forEach((field, index) => {
+		if (error.length <= 0) {
+			error = types[field](value, validations);
+		}
+	});
+
+	return error;
 }

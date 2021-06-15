@@ -7,7 +7,7 @@ class EmployeeValidator
     public function login(array $data)
     {
         $validations = [
-            "username" => ["required" => true],
+            "email" => ["required" => true],
             "password" => ["required" => true, "minLength" => 6]
         ];
 
@@ -36,7 +36,7 @@ class EmployeeValidator
             "name" => ["required" => true],
             "surname" => ["required" => true],
             "email" => ["required" => true],
-            "password" => ["required" => true, "minLength" => 6],
+            "password" => ["required" => false, "minLength" => 6],
         ];
 
         return validate($data, $validations);
@@ -46,6 +46,16 @@ class EmployeeValidator
     {
         $validations = [
             "id" => ["required" => true, "length" => 19],
+        ];
+
+        return validate($data, $validations);
+    }
+
+    public function resetPassword(array $data)
+    {
+        $validations = [
+            "forgot_password_token" => ["required" => true, "length" => 19],
+            "password" => ["required" => true],
         ];
 
         return validate($data, $validations);

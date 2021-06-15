@@ -1,4 +1,5 @@
 <?php
+
 use Slim\Factory\AppFactory;
 
 header('Access-Control-Allow-Origin: *');
@@ -17,18 +18,26 @@ $app->post('/api/client/{id}', "\\App\\API\\ClientController:update");
 $app->get('/api/client/delete/{id}', "\\App\\API\\ClientController:delete");
 
 $app->post('/api/employee/login', "\\App\\API\\EmployeeController:login");
+$app->post('/api/employee/register', "\\App\\API\\EmployeeController:register");
+$app->post('/api/employee/forgot-password', "\\App\\API\\EmployeeController:forgotPassword");
+$app->post('/api/employee/check-forgot-password-token', "\\App\\API\\EmployeeController:checkForgotPasswordToken");
+$app->post('/api/employee/reset-password', "\\App\\API\\EmployeeController:resetPassword");
 $app->get('/api/employee', "\\App\\API\\EmployeeController:index");
 $app->get('/api/employee/{id}', "\\App\\API\\EmployeeController:show");
 $app->post('/api/employee', "\\App\\API\\EmployeeController:store");
 $app->post('/api/employee/{id}', "\\App\\API\\EmployeeController:update");
 $app->get('/api/employee/delete/{id}', "\\App\\API\\EmployeeController:delete");
 
+$app->get('/api/product/seed', "\\App\\API\\ProductController:seed");
+$app->get('/api/product/all', "\\App\\API\\ProductController:all");
 $app->get('/api/product', "\\App\\API\\ProductController:index");
 $app->get('/api/product/{id}', "\\App\\API\\ProductController:show");
 $app->post('/api/product', "\\App\\API\\ProductController:store");
 $app->post('/api/product/{id}', "\\App\\API\\ProductController:update");
 $app->get('/api/product/delete/{id}', "\\App\\API\\ProductController:delete");
 
+$app->get('/api/category/seed', "\\App\\API\\CategoryController:seed");
+$app->get('/api/category/all', "\\App\\API\\CategoryController:all");
 $app->get('/api/category', "\\App\\API\\CategoryController:index");
 $app->get('/api/category/{id}', "\\App\\API\\CategoryController:show");
 $app->post('/api/category', "\\App\\API\\CategoryController:store");

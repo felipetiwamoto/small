@@ -1,0 +1,31 @@
+.button{
+	padding:5px 15px;
+	min-height:40px;
+	font-size:16px;
+	transition:0.3s;
+	border:1px solid $greyb;
+	background-color: $greyd;
+	color:$grey5;
+	outline:none;
+	display:inline-flex;
+	justify-content: center;
+	align-items: center;
+	cursor:pointer;
+	
+	&:hover{
+		transition:0.3s;
+		filter:brightness(0.9);
+	}
+	
+	&.danger{
+		border-color: $danger;
+		background-color: $danger;
+		color:$white;
+	}
+	
+	&.success{
+		border-color: $success;
+		background-color: $success;
+		color:$white;
+	}
+}
