@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Todo App | Angular | Made by Felipe T. Iwamoto</title>
+  </head>
+  <body>
+    <div class="todo">
+      <h1 class="todo__title">Todo App (Angular)</h1>
+      <a target="_blank" href="#" class="todo__made_by"
+        >Made by Felipe T. Iwamoto</a
+      >
+      <div class="todo__content">
+        <form (submit)="handleSubmit($event)" class="todo__form">
+          <input
+            type="text"
+            class="todo__field"
+            placeholder="Ex: Study..."
+            [value]="form.title"
+            (input)="handleFormChange($event, 'title')"
+          />
+          <button
+            *ngIf="editing === null"
+            type="button"
+            class="todo__button"
+            (click)="handleForm()"
+          >
+            <mat-icon>add</mat-icon>
+          </button>
+          <button
+            *ngIf="editing !== null"
+            type="button"
+            class="todo__button"
+            (click)="handleForm()"
+          >
+            <mat-icon>edit</mat-icon>
+          </button>
+        </form>
+        <table class="todo__table">
+          <thead class="todo__thead">
+            <tr class="todo__tr">
+              <th class="todo__th">Title</th>
+              <th class="todo__th">Action</th>
+            </tr>
+          </thead>
+          <tbody class="todo__tbody">
+            <tr class="todo__tr" *ngFor="let todo of todos">
+              <td class="todo__td" (click)="setEditing(todo)">
+                {{ todo.title }}
+              </td>
+              <td class="todo__td">
+                <button
+                  class="todo__button todo__complete"
+                  (click)="done(todo)"
+                >
+                  <mat-icon>done</mat-icon>
+                </button>
+                <button
+                  class="todo__button todo__remove"
+                  (click)="remove(todo)"
+                >
+                  <mat-icon color="warn">remove</mat-icon>
+                </button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </body>
+</html>
