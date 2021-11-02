@@ -1,0 +1,3 @@
+function swiper(selector =  ".swiper") {
+    
+}

@@ -52,7 +52,7 @@ class Faker
 			// self::$city = json_decode(file_get_contents("./helper/faker/city.json"), true);
 			// self::$address = json_decode(file_get_contents("./helper/faker/address.json"), true);
 
-			// self::$text = json_decode(file_get_contents("./helper/faker/text.json"), true);
+			self::$text = json_decode(file_get_contents("./helper/faker/text.json"), true)[self::$origin];
 
 			self::$instance = (new self);
 		}
@@ -141,43 +141,49 @@ class Faker
 		self::$person["age"] = $age;
 	}
 
-	public static function setTitle($title = null)
+	public static function getWord(int $amount)
 	{
-		if (!is_null($title))
-			return self::$text["title"] = $title;
+		$word = [];
+
+		for($i = 1; $i <= $amount; $i++ ){
+			$word[] = randBetween(self::$text);
+		}
+
+		return implode(" ", $word);
 	}
 
-	public static function setDescription($description = null)
+	public static function getTitle($title = null)
 	{
-		if (!is_null($description))
-			return self::$text["description"] = $description;
+		return ucfirst(self::getWord(rand(3, 7)));
 	}
 
-	public static function setContent($content = null)
+	public static function getDescription($description = null)
 	{
-		if (!is_null($content))
-			return self::$text["content"] = $content;
+		return ucfirst(self::getWord(rand(10, 15)));
 	}
 
-	public static function setBody($body = null)
+	public static function getContent($content = null)
+	{
+		return ucfirst(self::getWord(rand(30, 50)));
+	}
+
+	public static function getBody($body = null)
 	{
 		if (!is_null($body))
 			return self::$text["body"] = $body;
 	}
 
-	public static function setPost($post = null)
+	public static function getPost($content = null)
 	{
-		if (!is_null($post))
-			return self::$text["post"] = $post;
+		return ucfirst(self::getWord(rand(30, 50)));
 	}
 
-	public static function setComment($comment = null)
+	public static function getComment($comment = null)
 	{
-		if (!is_null($comment))
-			return self::$text["comment"] = $comment;
+		return ucfirst(self::getWord(rand(10, 15)));
 	}
 
-	public static function setParagraph($paragraph = null)
+	public static function getParagraph($paragraph = null)
 	{
 		if (!is_null($paragraph))
 			return self::$text["paragraph"] = $paragraph;
@@ -193,20 +199,38 @@ class Faker
 		self::setBirthday();
 		self::setAge();
 
-		return self::getInstance();
+		return array_merge(
+			["id" => text()->unique()],
+			self::$person
+		);
 	}
 
-	public static function text()
+	public static function post()
 	{
-		self::setTitle();
-		self::setDescription();
-		self::setContent();
-		self::setBody();
-		self::setPost();
-		self::setComment();
-		self::setParagraph();
+		return [
+			"id" => text()->unique(),
+			"title" => self::getTitle(),
+			"content" => self::getPost(),
+		];
+	}
 
-		return self::getInstance();
+	public static function comment()
+	{
+		return [
+			"id" => text()->unique(),
+			"title" => self::getTitle(),
+			"content" => self::getComment(),
+		];
+	}
+	
+	public static function todo()
+	{
+		return [
+			"id" => text()->unique(),
+			"title" => self::getTitle(),
+			"content" => self::getDescription(),
+			"done" => randBetween([true, false])
+		];
 	}
 	
 	public static function generate()
